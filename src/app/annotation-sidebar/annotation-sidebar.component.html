@@ -1,0 +1,12 @@
+<div class="annotation-sidebar-container" >
+  <div class="header"><h5>Annotations</h5></div>
+ <div #sideAnnots *ngFor="let annotation of data$ | async; let i = index" style="display: flex; justify-content: center">
+  <div class="card" style="width: 90%; padding: 1rem; margin-bottom: 0.25rem;">
+    <div style="display: flex; flex-direction: column; flex-wrap: nowrap; gap: 10px;" (click)="showOnClick(annotation.id)">
+      <div id="annotation-type-{{i}}" style="font-weight: 600">{{annotation.type.toString().replaceAll(regex,"") | uppercase}}</div>
+      <div>{{annotation.createdAt | date:'yyyy-MM-dd'}} by {{annotation.creatorName}} </div>
+    </div>
+    <button class="btn btn-outline-dark btn-sm for-annotation-{{i}}" *ngIf="showCurrentComment(annotation.id)">Comments</button>
+  </div>
+ </div>
+</div>
