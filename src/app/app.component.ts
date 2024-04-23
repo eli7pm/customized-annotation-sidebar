@@ -26,7 +26,11 @@ export class AppComponent {
   private sidebarAnnotations: Array<Object>;
   private instance: Instance
   transfer = inject(DataServices)
-  @ViewChild(AnnotationSidebarComponent, {read: ElementRef}) sideAnnots?: ElementRef<HTMLElement>
+  @ViewChild(AnnotationSidebarComponent, { read: ElementRef }) set sideAnnots(
+    elementRef: ElementRef<HTMLElement> | undefined
+  ) {
+    this.load(elementRef);
+  }
   constructor(private dataService: DataServices) {
     this.data$ = this.dataService.getAnnotations;
 
@@ -51,28 +55,29 @@ export class AppComponent {
   showComments(selected: Object){
     this.dataService.showCommentSection(selected)
   }
- async ngAfterViewInit() {
+ async load(elementRef) {
    this.instance = await PSPDFKit.load({
       // Use the assets directory URL as a base URL. PSPDFKit will download its library assets from here.
       baseUrl: location.protocol + "//" + location.host + "/assets/",
       document: "/assets/document.pdf",
       container: "#pspdfkit-container",
-
-    })
-     this.instance.setAnnotationCreatorName("Eli")
-      //can't make the custom UI work
-     this.instance.setCustomUIConfiguration((customUiConfiguration) => ({
-
+      initialViewState: new PSPDFKit.ViewState({
+        sidebarMode: PSPDFKit.SidebarMode.CUSTOM
+      }),
+      customUI: {
         [PSPDFKit.UIElement.Sidebar]: {
           [PSPDFKit.SidebarMode.CUSTOM]({ containerNode }) {
-            containerNode.appendChild(this.sideAnnots?.nativeElement);
+            containerNode.appendChild(elementRef.nativeElement);
 
             return {
               node: containerNode
             };
           }
         }
-      }))
+      }
+    })
+     this.instance.setAnnotationCreatorName("Eli")
+      //can't make the custom UI work
       const customAnnotationSidebar = {
         type: "custom",
         title: "Annotation Sidebar",
